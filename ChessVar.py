@@ -33,34 +33,33 @@ class ChessVar:
 
     def make_move(self, move_from, move_to):
         """
-        A method that takes two move parameters - starting square and ending square.
-        The method determines if the move is valid. It will return False if not valid.
-        If valid, the method makes the requested move, adjust any captured pieces, update the
-        game state, update whose turn it is and return True.
         """
-        # Check/get the object in the move_from square
-        start_square = self.translate_square(move_from)
-        end_square = self.translate_square(move_to)
+        # Get the piece object at the move_from square and check the inputs are valid
+        square_start = self.translate_square(move_from)
+        if not square_start[0]:
+            print(square_start)
+            return False
+        square_end = self.translate_square(move_to)
+        if not square_end[0]:
+            return False
+        piece = self._board[square_start[0]][square_start[1]]
 
-        # Check there is a valid end square in bounds
-        if 0 > end_square[0] > 7 or 0 > end_square[1] > 7:
+        # Check if piece to be moved violates a player's turn
+        if piece.get_color() != self._player_turn:
             return False
 
-        piece_object = self._board[start_square[0]][start_square[1]]
-        if not piece_object:
-            print("Invalid move.")
+        # Get list of valid moves for the piece
+        valid_moves = piece.get_valid_moves(self._board)
+
+        # If the move_to square is in the list, make the move and return True
+        if square_end in valid_moves:
+            if self._board[square_end[0]][square_end[1]]:
+                self._board[square_end[0]][square_end[1]].capture_piece()
+            self._board[square_start[0]][square_start[1]] = None
+            self._board[square_end[0]][square_end[1]] = piece
+            return True
+        else:
             return False
-
-        # Check if the requested move is valid for each piece type
-        if not piece_object.is_move_valid(end_square):
-            return False
-
-        # Check if move results in illegal jump
-
-        # Update the board
-        self._board[start_square[0]][start_square[1]] = None
-        self._board[end_square[0]][end_square[1]] = piece_object
-        return True
 
 
 
@@ -147,9 +146,19 @@ class ChessVar:
                     '8': 0
                     }
 
-        col = ord(square[0]) - ord('a')
-        row = row_dict[square[1]]
-        return row, col
+        col_dict = {'a': 0,
+                    'b': 1,
+                    'c': 2,
+                    'd': 3,
+                    'e': 4,
+                    'f': 5,
+                    'g': 6,
+                    'h': 7,
+                    }
+        if square[0] not in col_dict or square[1] not in row_dict:
+            return False, False
+        else:
+            return row_dict[square[1]], col_dict[square[0]]
 
     def is_square_open(self, square):
         """
@@ -187,6 +196,13 @@ class ChessPiece:
         """
         pass
 
+    def capture_piece(self):
+        """
+        Changes a pieces captured status to captured.
+        """
+        self._captured = True
+        return True
+
     def get_piece_type(self):
         """Returns the type of piece a piece object is."""
         return self._piece_type
@@ -200,23 +216,13 @@ class King(ChessPiece):
         super().__init__(color=color, position=position)
         self._piece_type = 'KING'
 
-    def is_move_valid(self, move):
+    def get_valid_moves(self, board):
         """
-        Takes in the desired square to move to as a parameter.
-        Returns true if the move is valid. Returns false if not valid.
+        Takes the current board layout as input.
+        Returns a list of all possible moves for the king on the board.
         """
-        current_position = self.get_position()
+        print(self._position)
 
-        if current_position == move:
-            return False
-        elif -2 < current_position[0] - move[0] > 2:
-            return False
-        elif -2 < current_position[1] - move[1] > 2:
-            return False
-        elif current_position[0] - move[0] != 0 and current_position[1] - move[1] != 0:
-            return False
-        else:
-            return True
 
 
 class Queen(ChessPiece):
@@ -350,43 +356,29 @@ class Pawn(ChessPiece):
         self._has_moved = False
         self._piece_type = 'PAWN'
 
-    def is_move_valid(self, move):
+    def get_valid_moves(self, board):
         """
-        Takes in the desired square to move to as a parameter.
-        Returns true if the move is valid. Returns false if not valid.
+        Takes the current board layout as input.
+        Returns a list of all possible moves for the king on the board.
         """
-        current_position = self.get_position()
-
-        if current_position == move:
-            return False
-        elif current_position[1] != move[1]:
-            return False
-        elif move[0] < 0 or move[0] > 7:
-            return False
-        elif move[1] < 0 or move[1] > 7:
-            return False
-        elif move[0] == current_position[0]:
-            return False
-        elif self.get_color() == 'WHITE':
-            if not self._has_moved and current_position[0] - move[0] > 2:
-                return False
-            elif self._has_moved and current_position[0] - move[0] > 1:
-                return False
-            else:
-                return True
-        elif self.get_color() == 'BLACK':
-            if not self._has_moved and (move[0] - current_position[0]) < -2:
-                return False
-            elif self._has_moved and (move[0] - current_position[0]) < -1:
-                return False
-            else:
-                return True
+        x_coord = self._position[1]
+        y_coord = self._position[0]
+        valid_moves = []
+        if self._color == 'WHITE':
+            if not self._has_moved and not board[y_coord - 2][x_coord]:
+                valid_moves.append((y_coord - 2, x_coord))
+            if not board[y_coord - 1][x_coord]:
+                valid_moves.append((y_coord - 1, x_coord))
+        else:
+            if not self._has_moved and not board[y_coord + 2][x_coord]:
+                valid_moves.append((y_coord + 2, x_coord))
+            if not board[y_coord + 1][x_coord]:
+                valid_moves.append((y_coord + 1, x_coord))
+        return valid_moves
 
 myboard = ChessVar()
 myboard.print_board()
-myboard.make_move('a2', 'a4')
+myboard.make_move('a2', 'a3')
+myboard.make_move('a7', 'a1')
 myboard.print_board()
-myboard.make_move('a7', 'a5')
-myboard.print_board()
-myboard.make_move('b1', 'c3')
-myboard.print_board()
+

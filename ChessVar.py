@@ -13,15 +13,15 @@ class ChessVar:
         self._player_turn = 'WHITE'
         self._pieces = []
         self._board = [
-                       ['', '', '', '', '', '', '', ''],                # Chess board notation row 8
-                       ['', '', '', '', '', '', '', ''],
-                       ['', '', '', '', '', '', '', ''],
-                       ['', '', '', '', '', '', '', ''],
-                       ['', '', '', '', '', '', '', ''],
-                       ['', '', '', '', '', '', '', ''],
-                       ['', '', '', '', '', '', '', ''],
-                       ['', '', '', '', '', '', '', ''],                # Chess board notation row 1
-                       ]
+                       [None, None, None, None, None, None, None, None],                # Chess board notation row 8
+                       [None, None, None, None, None, None, None, None],
+                       [None, None, None, None, None, None, None, None],
+                       [None, None, None, None, None, None, None, None],
+                       [None, None, None, None, None, None, None, None],
+                       [None, None, None, None, None, None, None, None],
+                       [None, None, None, None, None, None, None, None],
+                       [None, None, None, None, None, None, None, None],              # Chess board notation row 1
+                     ]
 
     def get_game_state(self):
         """
@@ -36,6 +36,23 @@ class ChessVar:
         If valid, the method makes the requested move, adjust any captured pieces, update the
         game state, update whose turn it is and return True.
         """
+        # Check/get the object in the move_from square
+        start_square = self.translate_square(move_from)
+        end_square = self.translate_square(move_to)
+        piece_object = self._board[start_square[0]][start_square[1]]
+        if not piece_object:
+            print("Invalid move.")
+            return False
+
+        # Check if the requested move is valid for each piece type
+        if not piece_object.is_move_valid(end_square):
+            print("Invalid move.")
+            return False
+
+        self._board[start_square[0]][start_square[1]] = None
+        self._board[end_square[0]][end_square[1]] = piece_object
+
+
 
     def initialize_board(self):
         """Sets up the board for a new game."""
@@ -86,31 +103,41 @@ class ChessVar:
         A class that prints the current board when called on a
         ChessVar object.
         """
-        print('-------------------------------------------------------------------------')
+        print('-------------------------------------------------------------------------------------------------')
         for row in self._board:
-            print('|        |        |        |        |        |        |        |        |')
+            print('|           |           |           |           |           |           |           |           |')
             for square in row:
                 print('|', end='')
-                if square == '':
-                    print('        ', end='')
+                if not square:
+                    print('           ', end='')
                 else:
+                    color = square.get_color()
                     if len(square.get_piece_type()) == 4:
-                        print('  ' + square.get_piece_type() + '  ', end='')
+                        print('  ' + color[0] + ' ' + square.get_piece_type() + '   ', end='')
                     elif len(square.get_piece_type()) == 5:
-                        print('  ' + square.get_piece_type() + ' ', end='')
+                        print('  ' + color[0] + ' ' + square.get_piece_type() + '  ', end='')
                     else:
-                        print(' ' + square.get_piece_type() + ' ', end='')
+                        print('  ' + color[0] + ' ' + square.get_piece_type() + ' ', end='')
             print('|')
-            print('|        |        |        |        |        |        |        |        |')
-            print('-------------------------------------------------------------------------')
+            print('|           |           |           |           |           |           |           |           |')
+            print('-------------------------------------------------------------------------------------------------')
 
     def translate_square(self, square):
         """
         Takes in a square as a parameter in chess board algebraic notation. Returns
         a tuple of the square's address for use in a 2D python array.
         """
+        row_dict = {'1': 7,
+                    '2': 6,
+                    '3': 5,
+                    '4': 4,
+                    '5': 3,
+                    '6': 2,
+                    '7': 1,
+                    '8': 0
+                    }
         col = ord(square[0]) - ord('a')
-        row = int(square[1]) - 1
+        row = row_dict[square[1]]
         return row, col
 
     def is_square_open(self, square):
@@ -319,27 +346,31 @@ class Pawn(ChessPiece):
 
         if current_position == move:
             return False
+        elif current_position[1] != move[1]:
+            return False
         elif move[0] < 0 or move[0] > 7:
             return False
         elif move[1] < 0 or move[1] > 7:
             return False
-        elif move[0] != current_position[0]:
+        elif move[0] == current_position[0]:
             return False
         elif self.get_color() == 'WHITE':
-            if not self._has_moved and (move[1] - current_position[1]) > 2:
+            if not self._has_moved and current_position[0] - move[0] > 2:
                 return False
-            elif self._has_moved and (move[1] - current_position[1]) > 1:
+            elif self._has_moved and current_position[0] - move[0] > 1:
                 return False
+            else:
+                return True
         elif self.get_color() == 'BLACK':
-            if not self._has_moved and (move[1] - current_position[1]) < -2:
+            if not self._has_moved and (move[0] - current_position[0]) < -2:
                 return False
-            elif self._has_moved and (move[1] - current_position[1]) < -1:
+            elif self._has_moved and (move[0] - current_position[0]) < -1:
                 return False
-        else:
-            if not self._has_moved:
-                self._has_moved = True
-            return True
+            else:
+                return True
 
 myboard = ChessVar()
 myboard.initialize_board()
+myboard.print_board()
+myboard.make_move('a2', 'a4')
 myboard.print_board()

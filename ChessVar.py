@@ -23,6 +23,8 @@ class ChessVar:
                        [None, None, None, None, None, None, None, None],              # Chess board notation row 1
                      ]
 
+        self.initialize_board()
+
     def get_game_state(self):
         """
         Method that returns the current status of the game.
@@ -39,6 +41,11 @@ class ChessVar:
         # Check/get the object in the move_from square
         start_square = self.translate_square(move_from)
         end_square = self.translate_square(move_to)
+
+        # Check there is a valid end square in bounds
+        if 0 > end_square[0] > 7 or 0 > end_square[1] > 7:
+            return False
+
         piece_object = self._board[start_square[0]][start_square[1]]
         if not piece_object:
             print("Invalid move.")
@@ -46,11 +53,14 @@ class ChessVar:
 
         # Check if the requested move is valid for each piece type
         if not piece_object.is_move_valid(end_square):
-            print("Invalid move.")
             return False
 
+        # Check if move results in illegal jump
+
+        # Update the board
         self._board[start_square[0]][start_square[1]] = None
         self._board[end_square[0]][end_square[1]] = piece_object
+        return True
 
 
 
@@ -136,6 +146,7 @@ class ChessVar:
                     '7': 1,
                     '8': 0
                     }
+
         col = ord(square[0]) - ord('a')
         row = row_dict[square[1]]
         return row, col
@@ -198,9 +209,11 @@ class King(ChessPiece):
 
         if current_position == move:
             return False
-        elif -1 < current_position[0] - move[0] < 1:
+        elif -2 < current_position[0] - move[0] > 2:
             return False
-        elif -1 < current_position[1] - move[1] < 1:
+        elif -2 < current_position[1] - move[1] > 2:
+            return False
+        elif current_position[0] - move[0] != 0 and current_position[1] - move[1] != 0:
             return False
         else:
             return True
@@ -370,7 +383,10 @@ class Pawn(ChessPiece):
                 return True
 
 myboard = ChessVar()
-myboard.initialize_board()
 myboard.print_board()
 myboard.make_move('a2', 'a4')
+myboard.print_board()
+myboard.make_move('a7', 'a5')
+myboard.print_board()
+myboard.make_move('b1', 'c3')
 myboard.print_board()

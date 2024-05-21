@@ -215,13 +215,36 @@ class King(ChessPiece):
     def __init__(self, color, position):
         super().__init__(color=color, position=position)
         self._piece_type = 'KING'
+        self._king_moves = [(0, 1), (0, -1), (1, 0), (1, 1), (1, -1), (-1, -1), (-1, 0), (-1, 1)]
 
     def get_valid_moves(self, board):
         """
         Takes the current board layout as input.
         Returns a list of all possible moves for the king on the board.
         """
-        print(self._position)
+        x_coord = self._position[1]
+        y_coord = self._position[0]
+        valid_moves = []
+
+        for move in self._king_moves:
+            new_x_coord = x_coord + move[1]
+            new_y_coord = y_coord + move[0]
+            is_valid = self.is_move_valid(board, new_x_coord, new_y_coord, self._color)
+            if is_valid:
+                valid_moves.append((new_y_coord, new_x_coord))
+        print(valid_moves)
+        return valid_moves
+
+    def is_move_valid(self, board, new_x_coord, new_y_coord, color):
+        """
+        """
+        if (new_x_coord < 0 or new_x_coord > 7) or (0 > new_y_coord or new_y_coord > 7):
+            return False
+        if board[new_y_coord][new_x_coord] and board[new_y_coord][new_x_coord].get_color() == color:
+            return False
+        else:
+            return True
+
 
 
 
@@ -359,7 +382,7 @@ class Pawn(ChessPiece):
     def get_valid_moves(self, board):
         """
         Takes the current board layout as input.
-        Returns a list of all possible moves for the king on the board.
+        Returns a list of all possible moves for the pawn on the board.
         """
         x_coord = self._position[1]
         y_coord = self._position[0]
@@ -378,7 +401,7 @@ class Pawn(ChessPiece):
 
 myboard = ChessVar()
 myboard.print_board()
-myboard.make_move('a2', 'a3')
-myboard.make_move('a7', 'a1')
+myboard.make_move('d2', 'd4')
+myboard.make_move('e1', 'd2')
 myboard.print_board()
 

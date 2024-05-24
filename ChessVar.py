@@ -57,10 +57,16 @@ class ChessVar:
             self._board[square_start[0]][square_start[1]] = None
             self._board[square_end[0]][square_end[1]] = piece
             piece.set_position(square_end)
+
+            # Set _has_moved to True if it is a pawns first move
+            if piece.get_piece_type() == 'PAWN' and not piece.get_pawn_move_status():
+                piece.set_pawn_move_status()
+
             if self._player_turn == 'WHITE':
                 self._player_turn = 'BLACK'
             else:
                 self._player_turn = 'WHITE'
+
             return True
         else:
             return False
@@ -554,6 +560,16 @@ class Pawn(ChessPiece):
         self._has_moved = False
         self._piece_type = 'PAWN'
 
+    def get_pawn_move_status(self):
+        """
+        """
+        return self._has_moved
+
+    def set_pawn_move_status(self):
+        """
+        """
+        self._has_moved = True
+
     def get_valid_moves(self, board):
         """
         Takes the current board layout as input.
@@ -590,5 +606,6 @@ myboard.make_move('f4', 'd6') # white
 myboard.make_move('b8', 'c6') # black
 myboard.make_move('g1', 'f3') # white
 myboard.make_move('c6', 'e5') # black
+myboard.make_move('d3', 'd4') # white
 myboard.print_board()
 

@@ -583,11 +583,19 @@ class Pawn(ChessPiece):
                 valid_moves.append((y_coord - 2, x_coord))
             if not board[y_coord - 1][x_coord]:
                 valid_moves.append((y_coord - 1, x_coord))
+            if board[y_coord - 1][x_coord - 1] and board[y_coord - 1][x_coord - 1].get_color() != 'WHITE':
+                valid_moves.append((y_coord - 1, x_coord - 1))
+            if board[y_coord - 1][x_coord + 1] and board[y_coord - 1][x_coord + 1].get_color() != 'WHITE':
+                valid_moves.append((y_coord - 1, x_coord + 1))
         else:
             if not self._has_moved and not board[y_coord + 2][x_coord]:
                 valid_moves.append((y_coord + 2, x_coord))
             if not board[y_coord + 1][x_coord]:
                 valid_moves.append((y_coord + 1, x_coord))
+            if board[y_coord + 1][x_coord - 1] and board[y_coord + 1][x_coord - 1].get_color() != 'BLACK':
+                valid_moves.append((y_coord + 1, x_coord - 1))
+            if board[y_coord + 1][x_coord + 1] and board[y_coord + 1][x_coord + 1].get_color() != 'BLACK':
+                valid_moves.append((y_coord + 1, x_coord + 1))
         return valid_moves
 
 myboard = ChessVar()
@@ -607,5 +615,7 @@ myboard.make_move('b8', 'c6') # black
 myboard.make_move('g1', 'f3') # white
 myboard.make_move('c6', 'e5') # black
 myboard.make_move('d3', 'd4') # white
+myboard.make_move('b6', 'b5') # black
+myboard.make_move('d4', 'e5') # white
 myboard.print_board()
 

@@ -37,7 +37,6 @@ class ChessVar:
         # Get the piece object at the move_from square and check the inputs are valid
         square_start = self.translate_square(move_from)
         if square_start[0] == None:
-            print(square_start)
             return False
         square_end = self.translate_square(move_to)
         if square_end[0] == None:
@@ -57,6 +56,7 @@ class ChessVar:
                 self._board[square_end[0]][square_end[1]].capture_piece()
             self._board[square_start[0]][square_start[1]] = None
             self._board[square_end[0]][square_end[1]] = piece
+            piece.set_position(square_end)
             if self._player_turn == 'WHITE':
                 self._player_turn = 'BLACK'
             else:
@@ -65,10 +65,44 @@ class ChessVar:
         else:
             return False
 
-
-
     def initialize_board(self):
         """Sets up the board for a new game."""
+
+        # # Initialize white pieces
+        # white_king = self._pieces.append(King('WHITE', 'e1'))
+        # white_queen = self._pieces.append(Queen("WHITE", 'd1'))
+        # white_rook_1 = self._pieces.append(Rook('WHITE', 'a1'))
+        # white_rook_2 = self._pieces.append(Rook('WHITE', 'h1'))
+        # white_knight_1 = self._pieces.append(Knight("WHITE", 'b1'))
+        # white_knight_2 = self._pieces.append(Knight("WHITE", 'g1'))
+        # white_bishop_1 = self._pieces.append(Bishop("WHITE", 'c1'))
+        # white_bishop_2 = self._pieces.append(Bishop("WHITE", 'f1'))
+        # white_pawn_1 = self._pieces.append(Pawn("WHITE", 'a2'))
+        # white_pawn_2 = self._pieces.append(Pawn("WHITE", 'b2'))
+        # white_pawn_3 = self._pieces.append(Pawn("WHITE", 'c2'))
+        # white_pawn_4 = self._pieces.append(Pawn("WHITE", 'd2'))
+        # white_pawn_5 = self._pieces.append(Pawn("WHITE", 'e2'))
+        # white_pawn_6 = self._pieces.append(Pawn("WHITE", 'f2'))
+        # white_pawn_7 = self._pieces.append(Pawn("WHITE", 'g2'))
+        # white_pawn_8 = self._pieces.append(Pawn("WHITE", 'h2'))
+        #
+        # # Initialize black pieces
+        # black_king = self._pieces.append(King('BLACK', 'e8'))
+        # black_queen = self._pieces.append(Queen("BLACK", 'd8'))
+        # black_rook_1 = self._pieces.append(Rook('BLACK', 'a8'))
+        # black_rook_2 = self._pieces.append(Rook('BLACK', 'h8'))
+        # black_knight_1 = self._pieces.append(Knight("BLACK", 'b8'))
+        # black_knight_2 = self._pieces.append(Knight("BLACK", 'g8'))
+        # black_bishop_1 = self._pieces.append(Bishop("BLACK", 'c8'))
+        # black_bishop_2 = self._pieces.append(Bishop("BLACK", 'f8'))
+        # black_pawn_1 = self._pieces.append(Pawn("BLACK", 'a7'))
+        # black_pawn_2 = self._pieces.append(Pawn("BLACK", 'b7'))
+        # black_pawn_3 = self._pieces.append(Pawn("BLACK", 'c7'))
+        # black_pawn_4 = self._pieces.append(Pawn("BLACK", 'd7'))
+        # black_pawn_5 = self._pieces.append(Pawn("BLACK", 'e7'))
+        # black_pawn_6 = self._pieces.append(Pawn("BLACK", 'f7'))
+        # black_pawn_7 = self._pieces.append(Pawn("BLACK", 'g7'))
+        # black_pawn_8 = self._pieces.append(Pawn("BLACK", 'h7'))
 
         # Initialize white pieces
         white_king = self._pieces.append(King('WHITE', self.translate_square('e1')))
@@ -108,8 +142,8 @@ class ChessVar:
 
         # Add to board
         for piece in self._pieces:
-            position = piece.get_position()
-            self._board[position[0]][position[1]] = piece
+            x_coord, y_coord = piece.get_position()
+            self._board[x_coord][y_coord] = piece
 
     def print_board(self):
         """
@@ -198,7 +232,7 @@ class ChessPiece:
         Takes in a square as a parameter and sets that piece's position
         to the new coordinates.
         """
-        pass
+        self._position = square
 
     def capture_piece(self):
         """
@@ -247,10 +281,7 @@ class King(ChessPiece):
             is_valid = self.is_move_valid(board, new_x_coord, new_y_coord, self._color)
             if is_valid:
                 valid_moves.append((new_y_coord, new_x_coord))
-        print(valid_moves)
         return valid_moves
-
-
 
 
 class Queen(ChessPiece):
@@ -270,66 +301,76 @@ class Queen(ChessPiece):
         x_coord = self._position[1]
         y_coord = self._position[0]
 
-        for index in range(1, 7):
+        self._queen_moves = []
+
+        # Checks if spaces above piece are valid moves
+        for index in range(1, 8):
             if self.is_move_valid(board, x_coord, y_coord - index, self.get_color()):
                 self._queen_moves.append((y_coord - index, x_coord))
-                if board[x_coord][y_coord - index]:
+                if board[y_coord - index][x_coord]:
                     break
             else:
                 break
 
-        for index in range(1, 7):
+        # Checks if spaces below piece are valid moves
+        for index in range(1, 8):
             if self.is_move_valid(board, x_coord, y_coord + index, self.get_color()):
                 self._queen_moves.append((y_coord + index, x_coord))
-                if board[x_coord][y_coord + index]:
+                if board[y_coord + index][x_coord]:
                     break
             else:
                 break
 
-        for index in range(1, 7):
+        # Checks if spaces left of the piece are valid moves
+        for index in range(1, 8):
             if self.is_move_valid(board, x_coord - index, y_coord, self.get_color()):
                 self._queen_moves.append((y_coord, x_coord - index))
-                if board[x_coord - index][y_coord]:
+                if board[y_coord][x_coord - index]:
                     break
             else:
                 break
 
-        for index in range(1, 7):
+        # Check if spaces right of the piece are valid moves
+        for index in range(1, 8):
             if self.is_move_valid(board, x_coord + index, y_coord, self.get_color()):
                 self._queen_moves.append((y_coord, x_coord + index))
-                if board[x_coord + index][y_coord]:
+                if board[y_coord][x_coord + index]:
                     break
             else:
                 break
 
-        for index in range(1, 7):
+        # Check if spaces right/below are valid moves
+        for index in range(1, 8):
             if self.is_move_valid(board, x_coord + index, y_coord + index, self.get_color()):
                 self._queen_moves.append((y_coord + index, x_coord + index))
-                if board[x_coord + index][y_coord + index]:
+                if board[y_coord + index][x_coord + index]:
                     break
             else:
                 break
 
-        for index in range(1, 7):
+        # Checks if spaces left/above are valid moves
+        for index in range(1, 8):
             if self.is_move_valid(board, x_coord - index, y_coord - index, self.get_color()):
                 self._queen_moves.append((y_coord - index, x_coord - index))
-                if board[x_coord - index][y_coord - index]:
+                if board[y_coord - index][x_coord - index]:
                     break
             else:
                 break
 
-        for index in range(1, 7):
+        # Check if spaces right/above are valid moves
+        for index in range(1, 8):
             if self.is_move_valid(board, x_coord + index, y_coord - index, self.get_color()):
                 self._queen_moves.append((y_coord - index, x_coord + index))
-                if board[x_coord + index][y_coord - index]:
+                if board[y_coord - index][x_coord + index]:
                     break
             else:
                 break
 
-        for index in range(1, 7):
+        # Checks if spaces left/below are valid moves
+        for index in range(1, 8):
             if self.is_move_valid(board, x_coord - index, y_coord + index, self.get_color()):
                 self._queen_moves.append((y_coord + index, x_coord - index))
-                if board[x_coord - index][y_coord + index]:
+                if board[y_coord + index][x_coord - index]:
                     break
             else:
                 break
@@ -341,7 +382,6 @@ class Queen(ChessPiece):
         """
         self.generate_queen_moves(board)
         valid_moves = self._queen_moves
-
         return valid_moves
 
 
@@ -362,23 +402,19 @@ class Rook(ChessPiece):
         x_coord = self._position[1]
         y_coord = self._position[0]
 
-        for index in range(1, 7):
+        self._rook_moves = []
+
+        # Checks if spaces above piece are valid moves
+        for index in range(1, 8):
             if self.is_move_valid(board, x_coord, y_coord - index, self.get_color()):
                 self._rook_moves.append((y_coord - index, x_coord))
-                if board[x_coord][y_coord - index]:
+                if board[y_coord - index][x_coord]:
                     break
             else:
                 break
 
-        for index in range(1, 7):
-            if self.is_move_valid(board, x_coord - index, y_coord, self.get_color()):
-                self._rook_moves.append((y_coord, x_coord - index))
-                if board[x_coord - index][y_coord]:
-                    break
-            else:
-                break
-
-        for index in range(1, 7):
+        # Checks if spaces below piece are valid moves
+        for index in range(1, 8):
             if self.is_move_valid(board, x_coord, y_coord + index, self.get_color()):
                 self._rook_moves.append((y_coord + index, x_coord))
                 if board[y_coord + index][x_coord]:
@@ -386,10 +422,20 @@ class Rook(ChessPiece):
             else:
                 break
 
-        for index in range(1, 7):
+        # Checks if spaces left of the piece are valid moves
+        for index in range(1, 8):
+            if self.is_move_valid(board, x_coord - index, y_coord, self.get_color()):
+                self._rook_moves.append((y_coord, x_coord - index))
+                if board[y_coord][x_coord - index]:
+                    break
+            else:
+                break
+
+        # Check if spaces right of the piece are valid moves
+        for index in range(1, 8):
             if self.is_move_valid(board, x_coord + index, y_coord, self.get_color()):
                 self._rook_moves.append((y_coord, x_coord + index))
-                if board[x_coord + index][y_coord]:
+                if board[y_coord][x_coord + index]:
                     break
             else:
                 break
@@ -401,7 +447,6 @@ class Rook(ChessPiece):
         """
         self.generate_rook_moves(board)
         valid_moves = self._rook_moves
-        print(valid_moves)
         return valid_moves
 
 
@@ -413,27 +458,60 @@ class Bishop(ChessPiece):
     def __init__(self, color, position):
         super().__init__(color=color, position=position)
         self._piece_type = 'BISHOP'
+        self._bishop_moves = []
 
-    def is_move_valid(self, move):
+    def generate_bishop_moves(self, board):
         """
-        Takes in the desired square to move to as a parameter.
-        Returns true if the move is valid. Returns false if not valid.
         """
-        current_position = self.get_position()
-        slope = (move[1] - current_position[1]) / (current_position[0]  - current_position[0])
+        x_coord = self._position[1]
+        y_coord = self._position[0]
 
-        if current_position == move:
-            return False
-        elif move[0] < 0 or move[0] > 7:
-            return False
-        elif move[1] < 0 or move[1] > 7:
-            return False
-        elif current_position[0] - move[0] == 0 or current_position[1] - move[1] == 0:
-            return False
-        elif slope != 1 or slope != -1:
-            return False
-        else:
-            return True
+        self._bishop_moves = []
+
+        # Check if spaces right/below are valid moves
+        for index in range(1, 8):
+            if self.is_move_valid(board, x_coord + index, y_coord + index, self.get_color()):
+                self._bishop_moves.append((y_coord + index, x_coord + index))
+                if board[y_coord + index][x_coord + index]:
+                    break
+            else:
+                break
+
+        # Checks if spaces left/above are valid moves
+        for index in range(1, 8):
+            if self.is_move_valid(board, x_coord - index, y_coord - index, self.get_color()):
+                self._bishop_moves.append((y_coord - index, x_coord - index))
+                if board[y_coord - index][x_coord - index]:
+                    break
+            else:
+                break
+
+        # Check if spaces right/above are valid moves
+        for index in range(1, 8):
+            if self.is_move_valid(board, x_coord + index, y_coord - index, self.get_color()):
+                self._bishop_moves.append((y_coord - index, x_coord + index))
+                if board[y_coord - index][x_coord + index]:
+                    break
+            else:
+                break
+
+        # Checks if spaces left/below are valid moves
+        for index in range(1, 8):
+            if self.is_move_valid(board, x_coord - index, y_coord + index, self.get_color()):
+                self._bishop_moves.append((y_coord + index, x_coord - index))
+                if board[y_coord + index][x_coord - index]:
+                    break
+            else:
+                break
+
+    def get_valid_moves(self, board):
+        """
+        Takes the current board layout as input.
+        Returns a list of all possible moves for the bishop on the board.
+        """
+        self.generate_bishop_moves(board)
+        valid_moves = self._bishop_moves
+        return valid_moves
 
 
 class Knight(ChessPiece):
@@ -445,28 +523,24 @@ class Knight(ChessPiece):
     def __init__(self, color, position):
         super().__init__(color=color, position=position)
         self._piece_type = 'KNIGHT'
+        self._knight_moves = [(-2, -1), (2, -1), (-1, -2), (1, -2), (-2, 1), (-1, 2), (1, 2), (2, 1)]
 
-    def is_move_valid(self, move):
+    def get_valid_moves(self, board):
         """
-        Takes in the desired square to move to as a parameter.
-        Returns true if the move is valid. Returns false if not valid.
+        Takes the current board layout as input.
+        Returns a list of all possible moves for the king on the board.
         """
-        current_position = self.get_position()
+        x_coord = self._position[1]
+        y_coord = self._position[0]
+        valid_moves = []
 
-        if current_position == move:
-            return False
-        elif move[0] < 0 or move[0] > 7:
-            return False
-        elif move[1] < 0 or move[1] > 7:
-            return False
-        elif move[0] - current_position[0] == 2 or move[0] - current_position[0] == -2:
-            if move[1] - current_position[1] != 1 or move[1] - current_position[1] != -1:
-                return False
-        elif move[1] - current_position[1] == 2 or move[1] - current_position[1] == -2:
-            if move[0] - current_position[0] != 1 or move[0] - current_position[0] != -1:
-                return False
-        else:
-            return True
+        for move in self._knight_moves:
+            new_x_coord = x_coord + move[1]
+            new_y_coord = y_coord + move[0]
+            is_valid = self.is_move_valid(board, new_x_coord, new_y_coord, self._color)
+            if is_valid:
+                valid_moves.append((new_y_coord, new_x_coord))
+        return valid_moves
 
 
 class Pawn(ChessPiece):
@@ -485,9 +559,9 @@ class Pawn(ChessPiece):
         Takes the current board layout as input.
         Returns a list of all possible moves for the pawn on the board.
         """
-        x_coord = self._position[1]
-        y_coord = self._position[0]
+        x_coord, y_coord = self._position[1], self._position[0]
         valid_moves = []
+
         if self._color == 'WHITE':
             if not self._has_moved and not board[y_coord - 2][x_coord]:
                 valid_moves.append((y_coord - 2, x_coord))
@@ -502,12 +576,19 @@ class Pawn(ChessPiece):
 
 myboard = ChessVar()
 myboard.print_board()
-myboard.make_move('d2', 'd4') # white
-myboard.make_move('e7', 'e5') # black
-myboard.make_move('d1', 'd3') # white
-myboard.make_move('h7', 'h5') # black
-myboard.make_move('a2', 'a3') # white
-myboard.make_move('h8', 'h6') # black
-myboard.make_move('a1', 'a2') # white
+myboard.make_move('a2', 'a4') # white
+myboard.make_move('a7', 'a5') # black
+myboard.make_move('a1', 'a3') # white
+myboard.make_move('a8', 'a6') # black
+myboard.make_move('a3', 'h3') # white
+myboard.make_move('a6', 'h6') # black
+myboard.make_move('d2', 'd3') # white
+myboard.make_move('b7', 'b6') # black
+myboard.make_move('c1', 'f4') # white
+myboard.make_move('c8', 'a6') # black
+myboard.make_move('f4', 'd6') # white
+myboard.make_move('b8', 'c6') # black
+myboard.make_move('g1', 'f3') # white
+myboard.make_move('c6', 'e5') # black
 myboard.print_board()
 

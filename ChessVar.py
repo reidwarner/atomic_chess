@@ -234,6 +234,10 @@ class ChessVar:
         """
         blast_radius = [(0, 0), (1, 0), (1, 1), (0, 1), (-1, 0), (-1, 1), (-1, -1), (0, -1), (1, -1)]
 
+        # Check if a pawn suicide
+        if board[square[0]][square[1]].get_piece_type() == 'PAWN':
+            board[square[0]][square[1]] = None
+
         for position in blast_radius:
             blast_x = square[1] + position[1]
             blast_y = square[0] + position[0]
@@ -244,7 +248,7 @@ class ChessVar:
                 continue
 
             affected_piece = board[blast_y][blast_x]
-            if affected_piece and affected_piece.get_piece_type() != 'PAWN' and (blast_x != 0 and blast_y != 0):
+            if affected_piece and affected_piece.get_piece_type() != 'PAWN':
                 affected_piece.capture_piece()
                 if affected_piece.get_piece_type() == 'KING':
                     self._game_state = 'FINISHED'

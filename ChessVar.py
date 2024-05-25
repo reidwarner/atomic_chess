@@ -34,6 +34,10 @@ class ChessVar:
     def make_move(self, move_from, move_to):
         """
         """
+        # If game has already been won, return False
+        if self._game_state == 'FINISHED':
+            return False
+
         # Get the piece object at the move_from square and check the inputs are valid
         square_start = self.translate_square(move_from)
         if square_start[0] == None:
@@ -52,16 +56,26 @@ class ChessVar:
 
         # If the move_to square is in the list, make the move and return True
         if square_end in valid_moves:
-            if self._board[square_end[0]][square_end[1]]:
-                self._board[square_end[0]][square_end[1]].capture_piece()
-            self._board[square_start[0]][square_start[1]] = None
-            self._board[square_end[0]][square_end[1]] = piece
-            piece.set_position(square_end)
 
-            # Set _has_moved to True if it is a pawns first move
+            # If a piece is being captured, detonate explosion and remove affected pieces
+            captured_piece = self._board[square_end[0]][square_end[1]]
+            if captured_piece:
+                captured_piece.capture_piece()
+                self._board[square_end[0]][square_end[1]] = piece
+                self._board[square_start[0]][square_start[1]] = None
+                self.explosion(self._board, square_end)
+
+            # Move the piece
+            if not captured_piece:
+                self._board[square_end[0]][square_end[1]] = piece
+                self._board[square_start[0]][square_start[1]] = None
+                piece.set_position((square_end[0], square_end[1]))
+
+            # Check if pawn to set has moved
             if piece.get_piece_type() == 'PAWN' and not piece.get_pawn_move_status():
                 piece.set_pawn_move_status()
 
+            # Change Player Turn
             if self._player_turn == 'WHITE':
                 self._player_turn = 'BLACK'
             else:
@@ -213,6 +227,28 @@ class ChessVar:
             return True
         else:
             return False
+
+    def explosion(self, board, square):
+        """
+
+        """
+        blast_radius = [(0, 0), (1, 0), (1, 1), (0, 1), (-1, 0), (-1, 1), (-1, -1), (0, -1), (1, -1)]
+
+        for position in blast_radius:
+            blast_x = square[1] + position[1]
+            blast_y = square[0] + position[0]
+
+            if blast_x < 0 or blast_x > 7:
+                continue
+            if blast_y < 0 or blast_y > 7:
+                continue
+
+            affected_piece = board[blast_y][blast_x]
+            if affected_piece and affected_piece.get_piece_type() != 'PAWN':
+                affected_piece.capture_piece()
+                if affected_piece.get_piece_type() == 'KING':
+                    self._game_state = 'FINISHED'
+                board[blast_y][blast_x] = None
 
 
 class ChessPiece:
@@ -598,24 +634,4 @@ class Pawn(ChessPiece):
                 valid_moves.append((y_coord + 1, x_coord + 1))
         return valid_moves
 
-myboard = ChessVar()
-myboard.print_board()
-myboard.make_move('a2', 'a4') # white
-myboard.make_move('a7', 'a5') # black
-myboard.make_move('a1', 'a3') # white
-myboard.make_move('a8', 'a6') # black
-myboard.make_move('a3', 'h3') # white
-myboard.make_move('a6', 'h6') # black
-myboard.make_move('d2', 'd3') # white
-myboard.make_move('b7', 'b6') # black
-myboard.make_move('c1', 'f4') # white
-myboard.make_move('c8', 'a6') # black
-myboard.make_move('f4', 'd6') # white
-myboard.make_move('b8', 'c6') # black
-myboard.make_move('g1', 'f3') # white
-myboard.make_move('c6', 'e5') # black
-myboard.make_move('d3', 'd4') # white
-myboard.make_move('b6', 'b5') # black
-myboard.make_move('d4', 'e5') # white
-myboard.print_board()
 

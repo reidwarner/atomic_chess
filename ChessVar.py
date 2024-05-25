@@ -244,7 +244,7 @@ class ChessVar:
                 continue
 
             affected_piece = board[blast_y][blast_x]
-            if affected_piece and affected_piece.get_piece_type() != 'PAWN':
+            if affected_piece and affected_piece.get_piece_type() != 'PAWN' and (blast_x != 0 and blast_y != 0):
                 affected_piece.capture_piece()
                 if affected_piece.get_piece_type() == 'KING':
                     self._game_state = 'FINISHED'

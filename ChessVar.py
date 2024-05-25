@@ -251,7 +251,8 @@ class ChessVar:
             if affected_piece and affected_piece.get_piece_type() != 'PAWN':
                 affected_piece.capture_piece()
                 if affected_piece.get_piece_type() == 'KING':
-                    self._game_state = 'FINISHED'
+                    winner = self.get_player_turn()
+                    self._game_state = f'{winner}_WON'
                 board[blast_y][blast_x] = None
 
 

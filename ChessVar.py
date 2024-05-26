@@ -31,6 +31,11 @@ class ChessVar:
         """
         return self._game_state
 
+    def get_player_move(self):
+        """
+        """
+        return self._player_turn
+
     def make_move(self, move_from, move_to):
         """
         """

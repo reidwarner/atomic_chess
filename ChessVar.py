@@ -331,7 +331,7 @@ class King(ChessPiece):
             new_x_coord = x_coord + move[1]
             new_y_coord = y_coord + move[0]
             is_valid = self.is_move_valid(board, new_x_coord, new_y_coord, self._color)
-            if is_valid:
+            if is_valid and not board[new_y_coord][new_x_coord]:
                 valid_moves.append((new_y_coord, new_x_coord))
         return valid_moves
 

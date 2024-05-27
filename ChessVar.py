@@ -40,17 +40,22 @@ class ChessVar:
         """
         """
         # If game has already been won, return False
-        if self._game_state == 'FINISHED':
+        if self._game_state != 'UNFINISHED':
             return False
 
         # Get the piece object at the move_from square and check the inputs are valid
         square_start = self.translate_square(move_from)
-        if square_start[0] == None:
+        if not square_start[0]:
             return False
         square_end = self.translate_square(move_to)
-        if square_end[0] == None:
+        if not square_end[0]:
             return False
+
         piece = self._board[square_start[0]][square_start[1]]
+
+        # Return false if there is not a piece on the starting square
+        if not piece:
+            return False
 
         # Check if piece to be moved violates a player's turn
         if piece.get_color() != self._player_turn:

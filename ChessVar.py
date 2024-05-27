@@ -500,6 +500,7 @@ class Rook(ChessPiece):
         """
         self.generate_rook_moves(board)
         valid_moves = self._rook_moves
+        print(valid_moves)
         return valid_moves
 
 

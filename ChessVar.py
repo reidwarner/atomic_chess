@@ -45,13 +45,17 @@ class ChessVar:
 
         # Get the piece object at the move_from square and check the inputs are valid
         square_start = self.translate_square(move_from)
-        if square_start[0] == None:
+        if square_start[0] is False:
             return False
         square_end = self.translate_square(move_to)
-        if square_start[1] == None:
+        if square_start[1] is False:
             return False
 
         piece = self._board[square_start[0]][square_start[1]]
+
+        # If a piece is not at start square, return False
+        if not piece:
+            return False
 
         # Check if piece to be moved violates a player's turn
         if piece.get_color() != self._player_turn:
@@ -500,7 +504,6 @@ class Rook(ChessPiece):
         """
         self.generate_rook_moves(board)
         valid_moves = self._rook_moves
-        print(valid_moves)
         return valid_moves
 
 
@@ -647,3 +650,15 @@ class Pawn(ChessPiece):
         return valid_moves
 
 
+# Main function testing
+def main():
+    game = ChessVar()
+    while game.get_game_state() == 'UNFINISHED':
+        turn = game.get_player_turn()
+        game.print_board()
+        move_start = input(f"It is player {turn}'s turn.\nPlease enter the square of the piece you want to move: ")
+        move_end = input("Please enter the square you want to move to: ")
+        game.make_move(move_start, move_end)
+
+if __name__ == "__main__":
+    main()

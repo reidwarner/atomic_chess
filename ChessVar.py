@@ -657,17 +657,3 @@ class Pawn(ChessPiece):
                 if board[y_coord + 1][x_coord + 1] and board[y_coord + 1][x_coord + 1].get_color() != 'BLACK':
                     valid_moves.append((y_coord + 1, x_coord + 1))
         return valid_moves
-
-
-# Main function testing
-def main():
-    game = ChessVar()
-    while game.get_game_state() == 'UNFINISHED':
-        turn = game.get_player_turn()
-        game.print_board()
-        move_start = input(f"It is player {turn}'s turn.\nPlease enter the square of the piece you want to move: ")
-        move_end = input("Please enter the square you want to move to: ")
-        game.make_move(move_start, move_end)
-
-if __name__ == "__main__":
-    main()

@@ -630,23 +630,31 @@ class Pawn(ChessPiece):
         valid_moves = []
 
         if self._color == 'WHITE':
-            if not self._has_moved and not board[y_coord - 2][x_coord]:
-                valid_moves.append((y_coord - 2, x_coord))
-            if not board[y_coord - 1][x_coord]:
-                valid_moves.append((y_coord - 1, x_coord))
-            if board[y_coord - 1][x_coord - 1] and board[y_coord - 1][x_coord - 1].get_color() != 'WHITE':
-                valid_moves.append((y_coord - 1, x_coord - 1))
-            if board[y_coord - 1][x_coord + 1] and board[y_coord - 1][x_coord + 1].get_color() != 'WHITE':
-                valid_moves.append((y_coord - 1, x_coord + 1))
+            if self.is_move_valid(board, x_coord, y_coord - 2, self.get_color()):
+                if not self._has_moved and not board[y_coord - 2][x_coord]:
+                    valid_moves.append((y_coord - 2, x_coord))
+            if self.is_move_valid(board, x_coord, y_coord - 1, self.get_color()):
+                if not board[y_coord - 1][x_coord]:
+                    valid_moves.append((y_coord - 1, x_coord))
+            if self.is_move_valid(board, x_coord - 1, y_coord - 1, self.get_color()):
+                if board[y_coord - 1][x_coord - 1] and board[y_coord - 1][x_coord - 1].get_color() != 'WHITE':
+                    valid_moves.append((y_coord - 1, x_coord - 1))
+            if self.is_move_valid(board, x_coord + 1, y_coord - 1, self.get_color()):
+                if board[y_coord - 1][x_coord + 1] and board[y_coord - 1][x_coord + 1].get_color() != 'WHITE':
+                    valid_moves.append((y_coord - 1, x_coord + 1))
         else:
-            if not self._has_moved and not board[y_coord + 2][x_coord]:
-                valid_moves.append((y_coord + 2, x_coord))
-            if not board[y_coord + 1][x_coord]:
-                valid_moves.append((y_coord + 1, x_coord))
-            if board[y_coord + 1][x_coord - 1] and board[y_coord + 1][x_coord - 1].get_color() != 'BLACK':
-                valid_moves.append((y_coord + 1, x_coord - 1))
-            if board[y_coord + 1][x_coord + 1] and board[y_coord + 1][x_coord + 1].get_color() != 'BLACK':
-                valid_moves.append((y_coord + 1, x_coord + 1))
+            if self.is_move_valid(board, x_coord, y_coord + 2, self.get_color()):
+                if not self._has_moved and not board[y_coord + 2][x_coord]:
+                    valid_moves.append((y_coord + 2, x_coord))
+            if self.is_move_valid(board, x_coord, y_coord + 1, self.get_color()):
+                if not board[y_coord + 1][x_coord]:
+                    valid_moves.append((y_coord + 1, x_coord))
+            if self.is_move_valid(board, x_coord + 1, y_coord + 1, self.get_color()):
+                if board[y_coord + 1][x_coord - 1] and board[y_coord + 1][x_coord - 1].get_color() != 'BLACK':
+                    valid_moves.append((y_coord + 1, x_coord - 1))
+            if self.is_move_valid(board, x_coord + 1, y_coord + 1, self.get_color()):
+                if board[y_coord + 1][x_coord + 1] and board[y_coord + 1][x_coord + 1].get_color() != 'BLACK':
+                    valid_moves.append((y_coord + 1, x_coord + 1))
         return valid_moves
 
 

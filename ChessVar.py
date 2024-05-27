@@ -1,13 +1,12 @@
 # Author: Reid Singleton
 # GitHub username: reidwarner
-# Date: 5/20/2024
+# Date: 5/27/2024
 # Description: A program for playing atomic chess.
 
 class ChessVar:
     """
-    A class that allows two users to play Atomic Chess.
+    A class that represents a game of atomic chess.
     """
-
     def __init__(self):
         self._game_state = 'UNFINISHED'
         self._player_turn = 'WHITE'
@@ -27,17 +26,25 @@ class ChessVar:
 
     def get_game_state(self):
         """
-        Method that returns the current status of the game.
+        A method that returns a string for the current status of the game -
+        whether the game is unfinished or if a player has won the game.
+        :return: string that represents an unfinished game or if a player has won
         """
         return self._game_state
 
     def get_player_turn(self):
         """
+        A method that returns a string for which color's turn it is.
+        :return: string that contains current turn's color
         """
         return self._player_turn
 
     def make_move(self, move_from, move_to):
         """
+        A method for moving a chess piece.
+        :param move_from: string that represents where the piece the player wants to move is in algebraic notation
+        :param move_to: string that represents where the piece is to be moved in algebraic notation
+        :return: True if move is successful, False if not successful
         """
         # If game has already been won, return False
         if self._game_state != 'UNFINISHED':
@@ -96,44 +103,10 @@ class ChessVar:
             return False
 
     def initialize_board(self):
-        """Sets up the board for a new game."""
-
-        # # Initialize white pieces
-        # white_king = self._pieces.append(King('WHITE', 'e1'))
-        # white_queen = self._pieces.append(Queen("WHITE", 'd1'))
-        # white_rook_1 = self._pieces.append(Rook('WHITE', 'a1'))
-        # white_rook_2 = self._pieces.append(Rook('WHITE', 'h1'))
-        # white_knight_1 = self._pieces.append(Knight("WHITE", 'b1'))
-        # white_knight_2 = self._pieces.append(Knight("WHITE", 'g1'))
-        # white_bishop_1 = self._pieces.append(Bishop("WHITE", 'c1'))
-        # white_bishop_2 = self._pieces.append(Bishop("WHITE", 'f1'))
-        # white_pawn_1 = self._pieces.append(Pawn("WHITE", 'a2'))
-        # white_pawn_2 = self._pieces.append(Pawn("WHITE", 'b2'))
-        # white_pawn_3 = self._pieces.append(Pawn("WHITE", 'c2'))
-        # white_pawn_4 = self._pieces.append(Pawn("WHITE", 'd2'))
-        # white_pawn_5 = self._pieces.append(Pawn("WHITE", 'e2'))
-        # white_pawn_6 = self._pieces.append(Pawn("WHITE", 'f2'))
-        # white_pawn_7 = self._pieces.append(Pawn("WHITE", 'g2'))
-        # white_pawn_8 = self._pieces.append(Pawn("WHITE", 'h2'))
-        #
-        # # Initialize black pieces
-        # black_king = self._pieces.append(King('BLACK', 'e8'))
-        # black_queen = self._pieces.append(Queen("BLACK", 'd8'))
-        # black_rook_1 = self._pieces.append(Rook('BLACK', 'a8'))
-        # black_rook_2 = self._pieces.append(Rook('BLACK', 'h8'))
-        # black_knight_1 = self._pieces.append(Knight("BLACK", 'b8'))
-        # black_knight_2 = self._pieces.append(Knight("BLACK", 'g8'))
-        # black_bishop_1 = self._pieces.append(Bishop("BLACK", 'c8'))
-        # black_bishop_2 = self._pieces.append(Bishop("BLACK", 'f8'))
-        # black_pawn_1 = self._pieces.append(Pawn("BLACK", 'a7'))
-        # black_pawn_2 = self._pieces.append(Pawn("BLACK", 'b7'))
-        # black_pawn_3 = self._pieces.append(Pawn("BLACK", 'c7'))
-        # black_pawn_4 = self._pieces.append(Pawn("BLACK", 'd7'))
-        # black_pawn_5 = self._pieces.append(Pawn("BLACK", 'e7'))
-        # black_pawn_6 = self._pieces.append(Pawn("BLACK", 'f7'))
-        # black_pawn_7 = self._pieces.append(Pawn("BLACK", 'g7'))
-        # black_pawn_8 = self._pieces.append(Pawn("BLACK", 'h7'))
-
+        """
+        Sets up the board for a new game.
+        :return: Nothing
+        """
         # Initialize white pieces
         white_king = self._pieces.append(King('WHITE', self.translate_square('e1')))
         white_queen = self._pieces.append(Queen("WHITE", self.translate_square('d1')))
@@ -177,8 +150,9 @@ class ChessVar:
 
     def print_board(self):
         """
-        A class that prints the current board when called on a
-        ChessVar object.
+        A class that prints the current board when called on a ChessVar object. Prints the board
+        in an ASCII art styling.
+        :return: Nothing
         """
         print('-------------------------------------------------------------------------------------------------')
         for row in self._board:
@@ -203,6 +177,8 @@ class ChessVar:
         """
         Takes in a square as a parameter in chess board algebraic notation. Returns
         a tuple of the square's address for use in a 2D python array.
+        :param square: a string in algebraic notation
+        :return: a tuple of integers
         """
         row_dict = {'1': 7,
                     '2': 6,
@@ -228,19 +204,13 @@ class ChessVar:
         else:
             return row_dict[square[1]], col_dict[square[0]]
 
-    def is_square_open(self, square):
-        """
-        Takes in a square coordinates and returns True if the square is open
-        or False if there is a piece on the square.
-        """
-        if self._board[square[0]][square[1]] == '':
-            return True
-        else:
-            return False
-
     def explosion(self, board, square):
         """
-
+        A method that represents an explosion when a chess piece attacks an opponent's piece. Updates the
+        game board data member if the explosion removes chess pieces.
+        :param board: list of lists representing the chess board
+        :param square: tuple of integers representing a board position
+        :return: Nothing
         """
         blast_radius = [(0, 0), (1, 0), (1, 1), (0, 1), (-1, 0), (-1, 1), (-1, -1), (0, -1), (1, -1)]
 
@@ -268,7 +238,7 @@ class ChessVar:
 
 class ChessPiece:
     """
-    A class that represents the different types of chess pieces.
+    A class that represents the different types of chess pieces. Each piece type inherits from this class.
     """
     def __init__(self, color, position):
         self._color = color
@@ -288,15 +258,17 @@ class ChessPiece:
         """
         Takes in a square as a parameter and sets that piece's position
         to the new coordinates.
+        :param square: Tuple of integers that represents a position on the chess board
+        :return: Nothing
         """
         self._position = square
 
     def capture_piece(self):
         """
         Changes a pieces captured status to captured.
+        :return: Nothing
         """
         self._captured = True
-        return True
 
     def get_piece_type(self):
         """Returns the type of piece a piece object is."""
@@ -304,6 +276,13 @@ class ChessPiece:
 
     def is_move_valid(self, board, new_x_coord, new_y_coord, color):
         """
+        A method that checks if a potential move is in bounds on the chess board and if a move
+        would result in landing on a friendly chess piece.
+        :param board: list of lists that represents a chess board
+        :param new_x_coord: an integer representing one dimension of chess board position
+        :param new_y_coord: an integer representing one dimension of chess board position
+        :param color: string that represents the player's color
+        :return: True if move is valid, False if not valid
         """
         if (new_x_coord < 0 or new_x_coord > 7) or (0 > new_y_coord or new_y_coord > 7):
             return False
@@ -325,8 +304,9 @@ class King(ChessPiece):
 
     def get_valid_moves(self, board):
         """
-        Takes the current board layout as input.
-        Returns a list of all possible moves for the king on the board.
+        Creates a list of all the valid, possible moves for a King.
+        :param board: list of lists that represents a chess board
+        :return: list of tuples that represent coordinates on the chess board
         """
         x_coord = self._position[1]
         y_coord = self._position[0]
@@ -354,6 +334,10 @@ class Queen(ChessPiece):
 
     def generate_queen_moves(self, board):
         """
+        Creates a list of all the valid, possible moves for a Queen and saves them to a data member for the Queen
+        object.
+        :param board: list of lists that represents a chess board
+        :return: Nothing
         """
         x_coord = self._position[1]
         y_coord = self._position[0]
@@ -434,8 +418,9 @@ class Queen(ChessPiece):
 
     def get_valid_moves(self, board):
         """
-        Takes the current board layout as input.
-        Returns a list of all possible moves for the Queen on the board.
+        Creates a list of all the valid, possible moves for a Queen.
+        :param board: list of lists that represents a chess board
+        :return: list of tuples that represent coordinates on the chess board
         """
         self.generate_queen_moves(board)
         valid_moves = self._queen_moves
@@ -455,6 +440,10 @@ class Rook(ChessPiece):
 
     def generate_rook_moves(self, board):
         """
+        Creates a list of all the valid, possible moves for a Rook and saves them to a data member for the Rook
+        object.
+        :param board: list of lists that represents a chess board
+        :return: Nothing
         """
         x_coord = self._position[1]
         y_coord = self._position[0]
@@ -499,8 +488,9 @@ class Rook(ChessPiece):
 
     def get_valid_moves(self, board):
         """
-        Takes the current board layout as input.
-        Returns a list of all possible moves for the Queen on the board.
+        Creates a list of all the valid, possible moves for a Rook.
+        :param board: list of lists that represents a chess board
+        :return: list of tuples that represent coordinates on the chess board
         """
         self.generate_rook_moves(board)
         valid_moves = self._rook_moves
@@ -519,6 +509,10 @@ class Bishop(ChessPiece):
 
     def generate_bishop_moves(self, board):
         """
+        Creates a list of all the valid, possible moves for a bishop and saves them to a data member for the bishop
+        object.
+        :param board: list of lists that represents a chess board
+        :return: Nothing
         """
         x_coord = self._position[1]
         y_coord = self._position[0]
@@ -563,8 +557,9 @@ class Bishop(ChessPiece):
 
     def get_valid_moves(self, board):
         """
-        Takes the current board layout as input.
-        Returns a list of all possible moves for the bishop on the board.
+        Creates a list of all the valid, possible moves for a bishop.
+        :param board: list of lists that represents a chess board
+        :return: list of tuples that represent coordinates on the chess board
         """
         self.generate_bishop_moves(board)
         valid_moves = self._bishop_moves
@@ -584,8 +579,10 @@ class Knight(ChessPiece):
 
     def get_valid_moves(self, board):
         """
-        Takes the current board layout as input.
-        Returns a list of all possible moves for the king on the board.
+        Creates a list of all the valid, possible moves for a Knight and saves them to a data member for the Knight
+        object.
+        :param board: list of lists that represents a chess board
+        :return: List of tuples of coordinates of possible knight moves
         """
         x_coord = self._position[1]
         y_coord = self._position[0]
@@ -613,18 +610,22 @@ class Pawn(ChessPiece):
 
     def get_pawn_move_status(self):
         """
+        A method that returns True if a pawn has already been moved or False if the pawn
+        object has yet to move.
         """
         return self._has_moved
 
     def set_pawn_move_status(self):
         """
+        If called, sets the pawn move status to True.
         """
         self._has_moved = True
 
     def get_valid_moves(self, board):
         """
-        Takes the current board layout as input.
-        Returns a list of all possible moves for the pawn on the board.
+        Creates a list of all the valid, possible moves for a Pawn.
+        :param board: list of lists that represents a chess board
+        :return: list of tuples that represent coordinates on the chess board
         """
         x_coord, y_coord = self._position[1], self._position[0]
         valid_moves = []

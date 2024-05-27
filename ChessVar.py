@@ -45,17 +45,13 @@ class ChessVar:
 
         # Get the piece object at the move_from square and check the inputs are valid
         square_start = self.translate_square(move_from)
-        if not square_start[0]:
+        if square_start[0] == None:
             return False
         square_end = self.translate_square(move_to)
-        if not square_end[0]:
+        if square_start[1] == None:
             return False
 
         piece = self._board[square_start[0]][square_start[1]]
-
-        # Return false if there is not a piece on the starting square
-        if not piece:
-            return False
 
         # Check if piece to be moved violates a player's turn
         if piece.get_color() != self._player_turn:

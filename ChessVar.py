@@ -714,14 +714,15 @@ pygame.init()
 # displaying a window of height
 screen = pygame.display.set_mode((900, 900))
 
+game = ChessVar()
+game.display_board()
+
 running = True
 while running:
-    game = ChessVar()
-    game.display_board()
-    pygame.event.wait()
-
 
     for event in pygame.event.get():
+        if event.type == pygame.KEYUP:
+            game.display_board()
         if event.type == pygame.QUIT:
             running = False
 

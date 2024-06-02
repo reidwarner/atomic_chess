@@ -714,14 +714,37 @@ pygame.init()
 # displaying a window of height
 screen = pygame.display.set_mode((900, 900))
 
+# Function for converting coords to algebraic notaion
+def position_to_algebraic(pos):
+    """"""
+    letter_dict = {0: 'a',
+                   1: 'b',
+                   2: 'c',
+                   3: 'd',
+                   4: 'e',
+                   5: 'f',
+                   6: 'g',
+                   7: 'h',
+                   }
+    y, x = pos[0], pos[1]
+    x = int(10 - ((x + (SQUARE_LEN / 2)) // SQUARE_LEN) - 1)
+    y = ((y + (SQUARE_LEN / 2)) // SQUARE_LEN) - 1
+
+    return f'{letter_dict[y]}{str(x)}'
+
+
 game = ChessVar()
 game.display_board()
 
 running = True
+x_cord_from, y_cord_from, x_cord_to, y_cord_to = 0, 0, 0, 0
 while running:
-
     for event in pygame.event.get():
-        if event.type == pygame.KEYUP:
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            alg_from_square = position_to_algebraic(event.dict['pos'])
+        if event.type == pygame.MOUSEBUTTONUP:
+            alg_to_square = position_to_algebraic(event.dict['pos'])
+            game.make_move(alg_from_square, alg_to_square)
             game.display_board()
         if event.type == pygame.QUIT:
             running = False

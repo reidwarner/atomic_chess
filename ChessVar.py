@@ -3,6 +3,9 @@
 # Date: 5/27/2024
 # Description: A program for playing atomic chess.
 
+import pygame, os
+SQUARE_LEN = 100
+
 class ChessVar:
     """
     A class that represents a game of atomic chess.
@@ -235,6 +238,50 @@ class ChessVar:
                     self._game_state = f'{winner}_WON'
                 board[blast_y][blast_x] = None
 
+    def display_board(self):
+        """
+        """
+        # Display the board background
+        color_brown = (92, 64, 51)
+        pygame.draw.rect(screen, color_brown, pygame.Rect(0, 0, 900, 900))
+
+        # Initializing Color
+        color_light = (234, 221, 202)
+        color_dark = (150, 105, 25)
+
+        # Drawing Rectangle
+        red_index_left = 50
+        red_index_top = 50
+        for index_i in range(0, 7, 2):
+            for index_j in range(0, 8, 2):
+                pygame.draw.rect(screen, color_light, pygame.Rect(red_index_left + (index_j * SQUARE_LEN),
+                                                                  red_index_top + (index_i * SQUARE_LEN), SQUARE_LEN,
+                                                                  SQUARE_LEN))
+                pygame.draw.rect(screen, color_dark, pygame.Rect(red_index_left + ((index_j + 1) * SQUARE_LEN),
+                                                                 red_index_top + (index_i * SQUARE_LEN), SQUARE_LEN,
+                                                                 SQUARE_LEN))
+            for index_j in range(0, 8, 2):
+                pygame.draw.rect(screen, color_dark, pygame.Rect(red_index_left + (index_j * SQUARE_LEN),
+                                                                 (index_i * SQUARE_LEN) + SQUARE_LEN + red_index_top,
+                                                                 SQUARE_LEN, SQUARE_LEN))
+                pygame.draw.rect(screen, color_light, pygame.Rect(red_index_left + ((index_j + 1) * SQUARE_LEN),
+                                                                  (index_i * SQUARE_LEN) + SQUARE_LEN + red_index_top,
+                                                                  SQUARE_LEN, SQUARE_LEN))
+        # Display current pieces
+        for row in self._board:
+            for piece in row:
+                if piece:
+                    color = piece.get_color()
+                    position =piece.get_position()
+                    piece_type = piece.get_piece_type()
+                    filename = f'{color}_{piece_type}.png'
+                    image = pygame.image.load(os.path.join('img', filename)).convert_alpha()
+                    img_x = position[1] * SQUARE_LEN + (SQUARE_LEN / 2) + 5
+                    img_y = position[0] * SQUARE_LEN + (SQUARE_LEN / 2) + 5
+                    screen.blit(image, (img_x, img_y))
+
+                    pygame.display.flip()
+
 
 class ChessPiece:
     """
@@ -301,6 +348,8 @@ class King(ChessPiece):
         super().__init__(color=color, position=position)
         self._piece_type = 'KING'
         self._king_moves = [(0, 1), (0, -1), (1, 0), (1, 1), (1, -1), (-1, -1), (-1, 0), (-1, 1)]
+
+
 
     def get_valid_moves(self, board):
         """
@@ -657,3 +706,22 @@ class Pawn(ChessPiece):
                 if board[y_coord + 1][x_coord + 1] and board[y_coord + 1][x_coord + 1].get_color() != 'BLACK':
                     valid_moves.append((y_coord + 1, x_coord + 1))
         return valid_moves
+
+
+
+# initializing imported module
+pygame.init()
+# displaying a window of height
+screen = pygame.display.set_mode((900, 900))
+
+running = True
+while running:
+    game = ChessVar()
+    game.display_board()
+    pygame.event.wait()
+
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+

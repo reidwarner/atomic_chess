@@ -6,6 +6,9 @@
 import pygame, os
 SQUARE_LEN = 100
 
+pygame.font.init()
+my_font = pygame.font.SysFont('Arial', 45, 1)
+
 class ChessVar:
     """
     A class that represents a game of atomic chess.
@@ -234,7 +237,11 @@ class ChessVar:
             if affected_piece and affected_piece.get_piece_type() != 'PAWN':
                 affected_piece.capture_piece()
                 if affected_piece.get_piece_type() == 'KING':
-                    winner = self.get_player_turn()
+                    winner = affected_piece.get_color()
+                    if winner == 'BLACK':
+                        winner = 'WHITE'
+                    else:
+                        winner = 'BLACK'
                     self._game_state = f'{winner}_WON'
                 board[blast_y][blast_x] = None
 
@@ -280,7 +287,21 @@ class ChessVar:
                     img_y = position[0] * SQUARE_LEN + (SQUARE_LEN / 2) + 5
                     screen.blit(image, (img_x, img_y))
 
-                    pygame.display.flip()
+        if self.get_game_state() == 'UNFINISHED':
+            player_turn = self.get_player_turn()
+            player_turn = player_turn.capitalize()
+            text_surface = my_font.render(f"{player_turn}'s turn!", False, (255, 255, 255))
+            screen.blit(text_surface, (300, 0))
+        else:
+            won = self.get_game_state()
+            if 'BLACK' in won:
+                winner = 'Black won!'
+            else:
+                winner = 'White won!'
+            text_surface = my_font.render(winner, False, (255, 255, 255))
+            screen.blit(text_surface, (300, 0))
+
+        pygame.display.flip()
 
 
 class ChessPiece:
@@ -713,6 +734,7 @@ class Pawn(ChessPiece):
 pygame.init()
 # displaying a window of height
 screen = pygame.display.set_mode((900, 900))
+pygame.display.set_caption('Atomic Chess')
 
 # Function for converting coords to algebraic notaion
 def position_to_algebraic(pos):
@@ -745,6 +767,7 @@ while running:
         if event.type == pygame.MOUSEBUTTONUP:
             alg_to_square = position_to_algebraic(event.dict['pos'])
             game.make_move(alg_from_square, alg_to_square)
+
             game.display_board()
         if event.type == pygame.QUIT:
             running = False

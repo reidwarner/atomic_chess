@@ -4,6 +4,8 @@
 # Description: A program for playing atomic chess.
 
 import pygame, os
+from pygame.locals import *
+
 SQUARE_LEN = 100
 
 pygame.font.init()
@@ -219,6 +221,18 @@ class ChessVar:
         :return: Nothing
         """
         blast_radius = [(0, 0), (1, 0), (1, 1), (0, 1), (-1, 0), (-1, 1), (-1, -1), (0, -1), (1, -1)]
+
+        # Animate Explosion
+        explode_x = square[1] * SQUARE_LEN + SQUARE_LEN - (SQUARE_LEN / 4)
+        explode_y = square[0] * SQUARE_LEN + SQUARE_LEN - (SQUARE_LEN / 4)
+
+        for image in explosion_sprite:
+            clock.tick(25)
+            screen.blit(image, (explode_x, explode_y))
+            explode_x -= SQUARE_LEN / 4
+            explode_y -= SQUARE_LEN / 4
+            pygame.display.update()
+
 
         # Check if a pawn suicide
         if board[square[0]][square[1]].get_piece_type() == 'PAWN':
@@ -736,6 +750,17 @@ pygame.init()
 screen = pygame.display.set_mode((900, 900))
 pygame.display.set_caption('Atomic Chess')
 
+# Explosion animation
+explosion_sprite = [
+                    pygame.image.load(os.path.join('img', f"explosion_{str(50)}_pix.png")).convert_alpha(),
+                    pygame.image.load(os.path.join('img', f"explosion_{str(100)}_pix.png")).convert_alpha(),
+                    pygame.image.load(os.path.join('img', f"explosion_{str(150)}_pix.png")).convert_alpha(),
+                    pygame.image.load(os.path.join('img', f"explosion_{str(200)}_pix.png")).convert_alpha(),
+                    pygame.image.load(os.path.join('img', f"explosion_{str(250)}_pix.png")).convert_alpha(),
+                    pygame.image.load(os.path.join('img', f"explosion_{str(300)}_pix.png")).convert_alpha(),
+                    ]
+clock = pygame.time.Clock()
+
 # Function for converting coords to algebraic notaion
 def position_to_algebraic(pos):
     """"""
@@ -767,7 +792,6 @@ while running:
         if event.type == pygame.MOUSEBUTTONUP:
             alg_to_square = position_to_algebraic(event.dict['pos'])
             game.make_move(alg_from_square, alg_to_square)
-
             game.display_board()
         if event.type == pygame.QUIT:
             running = False
